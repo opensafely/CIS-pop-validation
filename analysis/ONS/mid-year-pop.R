@@ -8,7 +8,7 @@ library('onsr')
 #ons_ids()
 
 
-fs::dir_create(here("output", "ONS-data"))
+fs::dir_create(here("ONS-data"))
 
 ons_pop_estimates <- ons_get("mid-year-pop-est")
 
@@ -66,4 +66,4 @@ ons_pop_estimates_region <-
     region
   )
 
-write_rds(ons_pop_estimates_region, here("output", "ONS-data", "mid-year-pop.rds"))
+write_rds(ons_pop_estimates_region, here("ONS-data", "mid-year-pop.rds"))

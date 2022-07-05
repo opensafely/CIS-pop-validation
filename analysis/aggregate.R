@@ -133,7 +133,7 @@ tpp_pop <-
 
 # import ONS mid population estimates ----
 
-ons_pop <- read_rds(here("output", "ONS-data", "mid-year-pop.rds"))
+ons_pop <- read_rds(here("ONS-data", "mid-year-pop.rds"))
 
 ons_pop <-
   ons_pop %>%
