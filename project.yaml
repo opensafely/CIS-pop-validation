@@ -1,12 +1,169 @@
 version: '3.0'
 
 expectations:
-  population_size: 1000
+
+  population_size: 50000
 
 actions:
 
-  generate_study_population:
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## DO NOT EDIT project.yaml DIRECTLY 
+  ## This file is created by create-project.R 
+  ## Edit and run create-project.R to update the project.yaml 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## Extract data and create measures 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  extract_data_20200427:
     run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2020-04-27 to 2020-04-27 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
     outputs:
       highly_sensitive:
-        cohort: output/input.csv
+        cohort: output/measures/input_2020-04-27.feather
+
+  extract_data_20200622:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2020-06-22 to 2020-06-22 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2020-06-22.feather
+
+  extract_data_20200817:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2020-08-17 to 2020-08-17 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2020-08-17.feather
+
+  extract_data_20201012:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2020-10-12 to 2020-10-12 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2020-10-12.feather
+
+  extract_data_20201207:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2020-12-07 to 2020-12-07 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2020-12-07.feather
+
+  extract_data_20210201:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2021-02-01 to 2021-02-01 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2021-02-01.feather
+
+  extract_data_20210329:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2021-03-29 to 2021-03-29 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2021-03-29.feather
+
+  extract_data_20210524:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2021-05-24 to 2021-05-24 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2021-05-24.feather
+
+  extract_data_20210719:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2021-07-19 to 2021-07-19 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2021-07-19.feather
+
+  extract_data_20210913:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2021-09-13 to 2021-09-13 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2021-09-13.feather
+
+  extract_data_20211108:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2021-11-08 to 2021-11-08 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2021-11-08.feather
+
+  extract_data_20220103:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2022-01-03 to 2022-01-03 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2022-01-03.feather
+
+  extract_data_20220228:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2022-02-28 to 2022-02-28 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2022-02-28.feather
+
+  extract_data_20220425:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2022-04-25 to 2022-04-25 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2022-04-25.feather
+
+  measures:
+    run: cohortextractor:latest generate_measures --study-definition study_definition
+      --output-dir=output/measures
+    needs:
+    - extract_data_20200427
+    - extract_data_20200622
+    - extract_data_20200817
+    - extract_data_20201012
+    - extract_data_20201207
+    - extract_data_20210201
+    - extract_data_20210329
+    - extract_data_20210524
+    - extract_data_20210719
+    - extract_data_20210913
+    - extract_data_20211108
+    - extract_data_20220103
+    - extract_data_20220228
+    - extract_data_20220425
+    outputs:
+      moderately_sensitive:
+        cohort: output/measures/measure_*.csv
+
+  ## # # # # # # # # # # # # # # # # # # # 
+  ## End 
+  ## # # # # # # # # # # # # # # # # # # # 
+
