@@ -185,6 +185,7 @@ data_measures_weights <-
     by= c("ageband5year", "sex", "region", "year")
   ) %>%
   mutate(
+    all = "all",
     measure_descr = fct_recoderelevel(measure, recoder$measure),
     period_descr = fct_recoderelevel(period, recoder$period),
   )
@@ -224,6 +225,7 @@ rounded_rates <- function(data, ...){
 data_sex <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, sex, date)
 data_ageband5year <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, ageband5year, date)
 data_region <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, region, date)
+data_all <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, all, date)
 
 
 # write to file ----
@@ -233,4 +235,5 @@ data_region <- rounded_rates(data_measures_weights, measure, measure_descr, peri
 writetype_csv(data_sex, path = fs::path(analysis_dir, "rates_sex.csv"))
 writetype_csv(data_ageband5year, path = fs::path(analysis_dir, "rates_ageband5year.csv"))
 writetype_csv(data_region, path = fs::path(analysis_dir, "rates_region.csv"))
+writetype_csv(data_all, path = fs::path(analysis_dir, "rates_all.csv"))
 

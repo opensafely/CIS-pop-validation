@@ -29,6 +29,7 @@ analysis_dir <- here("output", "analysis")
 data_sex <- readtype_csv(file = fs::path(analysis_dir, "rates_sex.csv"))
 data_ageband5year <- readtype_csv(file = fs::path(analysis_dir, "rates_ageband5year.csv"))
 data_region <- readtype_csv(file = fs::path(analysis_dir, "rates_region.csv"))
+data_all <- readtype_csv(file = fs::path(analysis_dir, "rates_all.csv"))
 
 
 # reshape to long format ----
@@ -52,6 +53,7 @@ long <- function(data){
 data_long_sex <- long(data_sex)
 data_long_ageband5year <- long(data_ageband5year)
 data_long_region <- long(data_region)
+data_long_all <- long(data_all)
 
 
 
