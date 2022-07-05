@@ -164,6 +164,19 @@ actions:
         cohort: output/measures/measure_*.csv
 
   ## # # # # # # # # # # # # # # # # # # # 
+  ## Calculate aggregated measures data 
+  ## # # # # # # # # # # # # # # # # # # # 
+
+  aggregate:
+    run: r:latest analysis/aggregate.R
+    needs:
+    - measures
+    outputs:
+      moderately_sensitive:
+        csv: output/analysis/*.csv
+        json: output/analysis/*.json
+
+  ## # # # # # # # # # # # # # # # # # # # 
   ## End 
   ## # # # # # # # # # # # # # # # # # # # 
 

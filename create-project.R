@@ -148,6 +148,19 @@ actions_list <- splice(
   ),
 
 
+  comment("# # # # # # # # # # # # # # # # # # #", "Calculate aggregated measures data", "# # # # # # # # # # # # # # # # # # #"),
+
+  action(
+    name = "aggregate",
+    run = "r:latest analysis/aggregate.R",
+    needs = list("measures"),
+    moderately_sensitive = lst(
+      csv = "output/analysis/*.csv",
+      json = "output/analysis/*.json"
+    )
+  ),
+
+
 comment("# # # # # # # # # # # # # # # # # # #", "End", "# # # # # # # # # # # # # # # # # # #")
 
 )
