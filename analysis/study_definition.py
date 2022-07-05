@@ -15,8 +15,8 @@ import codelists
 # import json module
 import json
 
-# import study dates defined in "./lib/design/study-dates.R" script
-with open("./analysis/design/study-dates.json") as f:
+# import study dates defined in "./analysis/lib/study-dates.R" script
+with open("./analysis/lib/study-dates.json") as f:
   study_dates = json.load(f)
 
 start_date = study_dates["start_date"]
