@@ -1,17 +1,24 @@
-
+################################################################################
+#
+# 
+#
+################################################################################
 
 library('tidyverse')
 library("rvest")
 library("readxl")
 library("lubridate")
+library("here")
 
 
 fs::dir_create(here("ONS-data"))
 
-ons_england_url <- "https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/coronaviruscovid19infectionsurveydata/2022/20220701covid19infectionsurveydatasetsengland.xlsx"
-fs::dir_create()
+ons_england_url <- 
+  "https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/coronaviruscovid19infectionsurveydata/2022/20220701covid19infectionsurveydatasetsengland.xlsx"
 
-download.file(url=ons_england_url, destfile=fs::path(here("ONS-data"), "CIS-2022.xlsx"), mode="wb")
+download.file(url = ons_england_url,
+              destfile = fs::path(here("ONS-data"),"CIS-2022.xlsx"),
+              mode = "wb")
 
 #### TESTING
 
@@ -22,11 +29,11 @@ england_urls <- paste0(
   "coronaviruscovid19infectionsurveydata/", england_years
 ) # nolint
 
-
+# most current version + previous versions
 file_urls <- lapply(england_urls, function(url) {
   session <- session(url)
   file_url <- session %>%
-    html_nodes(xpath = paste0(
+    html_element(xpath = paste0(
       "//a[contains(concat(' ', ",
       "normalize-space(@class),' '),' btn--primary ')]"
     )) %>%

@@ -67,7 +67,7 @@ defaults_list <- lst(
 source(here("analysis", "lib", "design.R"))
 
 
-extract_dates <- seq(as.Date(study_dates$start_date), as.Date(study_dates$end_date), by=56)
+extract_dates <- seq(as.Date(study_dates$start_date), as.Date(study_dates$end_date), by=14)
 extract_action_names <- glue("extract_data_{format(extract_dates, '%Y%m%d')}")
 
 extract_action <- function(dates){

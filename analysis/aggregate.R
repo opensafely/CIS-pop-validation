@@ -1,45 +1,34 @@
 ######################################
-
 # Import measures data
 # Import mid-year population estimates from ONS
 # Calculate weights to match English population
 # Aggregate measures at sex, ageband, and region level, weighted and unweighted
 ######################################
 
-
-# Preliminaries ----
-
-## Import libraries ----
+# preliminaries ----
+## import libraries ----
 library('tidyverse')
 library('lubridate')
 library('here')
-
-## Import design elements ----
+## import design elements ----
 source(here("analysis", "lib", "design.R"))
 source(here("analysis", "lib", "functions.R"))
-
 ## define input/output directories ----
-
 measures_dir <- here("output", "measures")
-
 fs::dir_create(here("output", "analysis"))
 analysis_dir <- here("output", "analysis")
 
 
-# Import measures ----
-
+# import measures ----
 # all measure csv files
 measures_path_all <- fs::dir_ls(path=measures_dir, glob="*.csv", type="file")
-
 # only summary files (exclude files with date suffix)
 measures_path_summary <- measures_path_all[!str_detect(measures_path_all, "\\_\\d+\\-\\d+\\-\\d+\\.csv$")]
-
 # name of measure
 measures_path_summary %>%
   fs::path_file() %>%
   fs::path_ext_remove() %>%
   str_remove("measure_")
-
 
 # import measures data from csv and standardise / tidy dataset
 data_measures <-
@@ -111,7 +100,6 @@ data_measures <-
 
 
 # Derive tpp population estimates by date / region / sex / age
-
 tpp_pop <-
   data_measures %>%
   filter(
@@ -130,9 +118,7 @@ tpp_pop <-
     tpp_prop = tpp_pop/sum(tpp_pop),
   ) %>% ungroup()
 
-
 # import ONS mid population estimates ----
-
 ons_pop <- read_rds(here("ONS-data", "mid-year-pop.rds"))
 
 ons_pop <-
@@ -160,7 +146,6 @@ ons_pop <-
   }
 
 # reweight rates ----
-
 # calculate weights to reweight TPP rates
 tpp_weights <-
   left_join(
@@ -190,18 +175,11 @@ data_measures_weights <-
     period_descr = fct_recoderelevel(period, recoder$period),
   )
 
-
-
-
 # calculate aggregated outputs to match ONS-CIS data publications ----
-
-
 roundmid_any <- function(x, to=1){
   # like round_any, but centers on (integer) midpoint of the rounding points
   ceiling(x/to)*to - (floor(to/2)*(x!=0))
 }
-
-
 rounded_rates <- function(data, ...){
   data %>%
     group_by(...) %>%
@@ -219,9 +197,6 @@ rounded_rates <- function(data, ...){
       rate_unweighted = events/population,
     )
 }
-
-
-
 data_sex <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, sex, date)
 data_ageband5year <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, ageband5year, date)
 data_region <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, region, date)

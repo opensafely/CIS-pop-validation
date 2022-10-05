@@ -1,17 +1,22 @@
-# ONS population data
+# # # # # # # # # # # # # # # # # # # # #
+# Purpose: Download and restructure mid pop estimates to be used to weight the
+# TPP population
+#
+# Notes: the 2020 mid year population estimates are used for reweighing
+# # # # # # # # # # # # # # # # # # # # #
 
-
+# preliminaries ----
+## import libraries ----
 library('tidyverse')
 library('onsr')
-
-
-#ons_ids()
-
-
+library('here')
+## create output directories ----
 fs::dir_create(here("ONS-data"))
 
+# download mid year pop estimates ----
 ons_pop_estimates <- ons_get("mid-year-pop-est")
 
+# restructure to same format as our estimates are in ----
 ons_pop_estimates_region <-
   ons_pop_estimates %>%
   filter(
@@ -24,8 +29,8 @@ ons_pop_estimates_region <-
       "E12000006",
       "E12000007",
       "E12000008",
-      "E12000009"
-    ),
+      "E12000009" 
+    ), # nine regions in England
     sex %in% c("male", "female"),
     `single-year-of-age` %in% c(0:89, "90+"),
     `calendar-years`==2020
@@ -33,7 +38,7 @@ ons_pop_estimates_region <-
   transmute(
     year=`calendar-years`,
     age=`single-year-of-age`,
-    age_int = as.integer(str_extract(age, "\\d+")),
+    age_int = as.integer(str_extract(age, "\\d+")), # remove +
     ageband5year = case_when(
       age_int>=0 & age_int<=4 ~ "0-4",
       age_int>=5 & age_int<=9 ~ "5-9",
@@ -56,7 +61,7 @@ ons_pop_estimates_region <-
       age_int>=90 ~ "90+",
     ),
     sex=`Sex`,
-    region=str_replace(str_to_title(`Geography`), "And The", "and The"),
+    region=str_replace(str_to_title(`Geography`), "And The", "and The"), # TPP
     mid_year_pop=`v4_0`,
   ) %>%
   arrange(
@@ -66,4 +71,5 @@ ons_pop_estimates_region <-
     region
   )
 
+# save restructured estimates ----
 write_rds(ons_pop_estimates_region, here("ONS-data", "mid-year-pop.rds"))
