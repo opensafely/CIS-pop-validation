@@ -22,7 +22,7 @@ with open("./analysis/lib/study-dates.json") as f:
 start_date = study_dates["start_date"]
 end_date = study_dates["end_date"]
 
-# Specify study defeinition
+# Specify study definition
 study = StudyDefinition(
   
   # Configure the expectations framework
@@ -82,10 +82,8 @@ study = StudyDefinition(
       return_expectations={"incidence": 0.01},
     ),
     
-   
     startdate = patients.fixed_value(start_date),
     enddate = patients.fixed_value(end_date),
-    
   ),
   
   
@@ -93,24 +91,20 @@ study = StudyDefinition(
   ## Demographics
   ###############################################################################
   
-  
-  # dereg_date=patients.date_deregistered_from_all_supported_practices(
-  #   on_or_after="covid_vax_disease_3_date",
-  #   date_format="YYYY-MM-DD",
-  # ),
-
-  
   age=patients.age_as_of( 
     "index_date",
   ),
+  
+  age_kids=patients.age_as_of(
+    "first_day_of_school_year(index_date)",
+  ),
 
   agebandCIS=patients.categorised_as(
-    # FIXME awaiting this feature https://github.com/opensafely-core/cohort-extractor/issues/836
     {
       "": "DEFAULT",
-      "2-11" : "age>=2 AND age<=11", # ONS bases this on school year (aged 2 to to year 6)
-      "12-15" : "age>=12 AND age<=15", # ONS bases this on school year (year 7 to year 11)
-      "16-24" : "age>=16 AND age<=24", # ONS bases this on school year (year 12 to aged 24)
+      "2-11" : "age_kids>=2 AND age_kids<=11", # ONS bases this on school year (aged 2 to to year 6)
+      "12-15" : "age_kids>=12 AND age_kids<=15", # ONS bases this on school year (year 7 to year 11)
+      "16-24" : "age_kids>=16 AND age_kids<=24", # ONS bases this on school year (year 12 to aged 24)
       "25-34" : "age>=25 AND age<=34",
       "35-49" : "age>=35 AND age<=49",
       "50-69" : "age>=50 AND age<=69",
@@ -154,7 +148,6 @@ study = StudyDefinition(
       "85-89" : "age>=85 AND age<=89",
       "90+" : "age>=90",
     },
-    
     return_expectations={
       "category":{"ratios": 
         {
@@ -182,7 +175,6 @@ study = StudyDefinition(
     },
   ),
   
-  
   sex=patients.sex(
     return_expectations={
       "rate": "universal",
@@ -191,7 +183,6 @@ study = StudyDefinition(
     }
   ),
   
-
   # # Ethnicity in 6 categories
   # ethnicity = patients.with_these_clinical_events(
   #   codelists.ethnicity,
@@ -288,7 +279,6 @@ study = StudyDefinition(
   #   }
   # ),
   
-
   # currently in hospital on index date
   # inhospital = patients.satisfying(
   # 
@@ -312,7 +302,6 @@ study = StudyDefinition(
   ## "Did any event occur on this day?"
   ############################################################
 
-  
   # positive covid test
   postest_01=patients.with_test_result_in_sgss(
       pathogen="SARS-CoV-2",
@@ -339,7 +328,7 @@ study = StudyDefinition(
   #   ),
   # ),
   
-  # Positive case identification
+  # positive case identification
   primary_care_covid_case_01=patients.with_these_clinical_events(
     combine_codelists( # FIXME - ask Colm about new codelists
       codelists.covid_primary_care_code,
@@ -352,7 +341,6 @@ study = StudyDefinition(
     find_first_match_in_period=True,
   ),
   
-  
   # emergency attendance for covid
   covidemergency_01=patients.attended_emergency_care(
     returning="binary_flag",
@@ -362,7 +350,6 @@ study = StudyDefinition(
     find_first_match_in_period=True,
   ),
   
-
   # covid admission
   covidadmitted_01=patients.admitted_to_hospital(
     returning="binary_flag",
@@ -372,7 +359,6 @@ study = StudyDefinition(
     find_first_match_in_period=True,
   ),
   
-  # 
   any_infection_or_disease_01=patients.satisfying(
     """
     postest_01
@@ -388,7 +374,6 @@ study = StudyDefinition(
   ## "Did any event occur within the last 14 days?"
   ############################################################
 
-  
   # positive covid test
   postest_14=patients.with_test_result_in_sgss(
       pathogen="SARS-CoV-2",
@@ -430,7 +415,6 @@ study = StudyDefinition(
     find_first_match_in_period=True,
   ),
   
-  
   # emergency attendance for covid
   covidemergency_14=patients.attended_emergency_care(
     returning="binary_flag",
@@ -439,7 +423,6 @@ study = StudyDefinition(
     with_these_diagnoses = codelists.covid_emergency,
     find_first_match_in_period=True,
   ),
-  
 
   # covid admission
   covidadmitted_14=patients.admitted_to_hospital(
@@ -450,7 +433,6 @@ study = StudyDefinition(
     find_first_match_in_period=True,
   ),
   
-  # 
   any_infection_or_disease_14=patients.satisfying(
     """
     postest_14
@@ -459,16 +441,12 @@ study = StudyDefinition(
     OR covidadmitted_14
     """
   ),
-  
-  
-  
-  
+
   ############################################################
   ## ever-day events
   ## "Did any event occur any time up to and including this day?"
   ############################################################
 
-  
   # positive covid test
   postest_ever=patients.with_test_result_in_sgss(
       pathogen="SARS-CoV-2",
@@ -496,7 +474,8 @@ study = StudyDefinition(
   #   ),
   # ),
   # 
-  # Positive case identification
+  
+  # positive case identification
   primary_care_covid_case_ever=patients.with_these_clinical_events(
     combine_codelists( # FIXME - ask Colm about new codelists
       codelists.covid_primary_care_code,
@@ -537,8 +516,6 @@ study = StudyDefinition(
   
 )
 
-
-
 measures = [
 
     ## single day events
@@ -556,7 +533,7 @@ measures = [
     #   group_by=["sex", "ageband5year", "region"],
     #   small_number_suppression=False
     # ),
-      Measure(
+    Measure(
       id="primary_care_covid_case_01",
       numerator="primary_care_covid_case_01",
       denominator="population",
@@ -585,7 +562,6 @@ measures = [
       small_number_suppression=False
     ),
 
-
     ## 14-day events
     Measure(
       id="postest_14",
@@ -601,7 +577,7 @@ measures = [
     #   group_by=["sex", "ageband5year", "region"],
     #   small_number_suppression=False
     # ),
-      Measure(
+    Measure(
       id="primary_care_covid_case_14",
       numerator="primary_care_covid_case_14",
       denominator="population",
@@ -630,7 +606,6 @@ measures = [
       small_number_suppression=False
     ),
 
-
     ## ever events
     Measure(
       id="postest_ever",
@@ -646,7 +621,7 @@ measures = [
     #   group_by=["sex", "ageband5year", "region"],
     #   small_number_suppression=False
     # ),
-      Measure(
+    Measure(
       id="primary_care_covid_case_ever",
       numerator="primary_care_covid_case_ever",
       denominator="population",
