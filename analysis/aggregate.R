@@ -192,10 +192,11 @@ rounded_rates <- function(data, ...){
   data %>%
     group_by(...) %>%
     summarise(
+      rate_unweighted = sum(events)/sum(population),
+      rate_weighted = sum(events*weight)/(sum(population*weight)), # = weighted.mean(events/population, population*weight),
+      # calculate these after calculating `rate_weighted` as the unaggregated versions are needed -- or use a different name!
       events = sum(events),
       population = sum(population),
-      #rate_unweighted = events/population,
-      rate_weighted = sum(events*weight)/(sum(population*weight)), # = weighted.mean(events/population, population*weight),
     ) %>%
     ungroup() %>%
     # rounding
@@ -205,6 +206,7 @@ rounded_rates <- function(data, ...){
       rate_unweighted = events/population,
     )
 }
+
 data_sex <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, sex, date)
 data_ageband5year <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, ageband5year, date)
 data_region <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, region, date)
