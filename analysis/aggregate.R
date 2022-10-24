@@ -166,8 +166,8 @@ tpp_weights <-
 data_measures_weights <-
   left_join(
     data_measures,
-    tpp_weights %>% select(ageband5year, sex, region, year, weight),
-    by= c("ageband5year", "sex", "region", "year")
+    tpp_weights %>% select(ageband5year, sex, region, year, date, weight),
+    by= c("ageband5year", "sex", "region", "year", "date")
   ) %>%
   mutate(
     all = "all",
