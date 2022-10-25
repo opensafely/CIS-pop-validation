@@ -18,7 +18,6 @@ measures_dir <- here("output", "measures")
 fs::dir_create(here("output", "analysis"))
 analysis_dir <- here("output", "analysis")
 
-
 # import measures ----
 # all measure csv files
 measures_path_all <- fs::dir_ls(path=measures_dir, glob="*.csv", type="file")
@@ -98,76 +97,35 @@ data_measures <-
     date,
   )
 
-
-# Derive tpp population estimates by date / region / sex / age
-tpp_pop <-
-  data_measures %>%
-  filter(
-    # should be exactly the same for other periods and measures
-    period=="01",
-    measure == "postest"
-  ) %>%
-  group_by(
-    ageband5year,sex,region,year,date
-  ) %>%
-  summarise(
-    tpp_pop=sum(population),
-  ) %>%
-  group_by(date) %>%
-  mutate(
-    tpp_prop = tpp_pop/sum(tpp_pop),
-  ) %>% ungroup()
-
 # import ONS mid population estimates ----
 ons_pop <- read_rds(here("ONS-data", "mid-year-pop.rds"))
 
+# 'ons_pop' has 342 columns: 19 ageband x 2 sex x 9 region
+# we multiply this table by 4, (342 x 4) to account for every year (2020-2023)
+# [note that we're using the same tables for every year for now]
+# the column total_ons_pop is needed to standardise the rates using the ons pop
 ons_pop <-
   ons_pop %>%
-  group_by(
-    ageband5year,sex,region,year
-  ) %>%
-  summarise(
-    ons_pop=sum(mid_year_pop)
-  ) %>%
-  group_by(year) %>%
   mutate(
-    total_pop = sum(ons_pop),
-    ons_prop = ons_pop/sum(ons_pop),
+    total_ons_pop = sum(mid_year_pop_ageband),
   ) %>%
   ungroup() %>%
   {
     ## use 2020 mid-year estimates until updated mid-year estimates come along...
     bind_rows(
-      mutate(., year =2020),
-      mutate(., year =2021),
-      mutate(., year =2022),
-      mutate(., year =2023)
+      mutate(., year = 2020),
+      mutate(., year = 2021),
+      mutate(., year = 2022),
+      mutate(., year = 2023)
     )
   }
 
-# reweight rates ----
-# calculate weights to reweight TPP rates
-tpp_weights <-
-  left_join(
-    tpp_pop,
-    ons_pop,
-    by = c(
-      "ageband5year",
-      "sex",
-      "region",
-      "year"
-    )
-  ) %>%
-  mutate(
-    weight = ons_prop/tpp_prop
-  )
-
-# calculate reweighted rates
+# join measures and ons_pop table
 data_measures_weights <-
   left_join(
     data_measures,
-    tpp_weights %>% select(ageband5year, sex, region, year, weight),
-    by= c("ageband5year", "sex", "region", "year")
+    ons_pop %>% select(ageband5year, sex, region, year, mid_year_pop_ageband, total_ons_pop),
+    by = c("ageband5year", "sex", "region", "year")
   ) %>%
   mutate(
     all = "all",
@@ -192,24 +150,26 @@ rounded_rates <- function(data, ...){
   data %>%
     group_by(...) %>%
     summarise(
-      events = sum(events),
-      population = sum(population),
-      #rate_unweighted = events/population,
-      rate_weighted = sum(events*weight)/(sum(population*weight)), # = weighted.mean(events/population, population*weight),
+      events_total = sum(events),
+      population_total = sum(population),
+      rate_weighted = sum((mid_year_pop_ageband / total_ons_pop) * rate), 
+      var_rate_weighted = sum((1 / total_ons_pop^2) * (total_ons_pop^2 / population) * rate * (1 - rate)),
+      .groups = "keep",
     ) %>%
     ungroup() %>%
     # rounding
     mutate(
-      events = roundmid_any(events,6),
-      population = roundmid_any(population,6),
+      events = roundmid_any(events_total,6),
+      population = roundmid_any(population_total,6),
       rate_unweighted = events/population,
-    )
+      var_rate_unweighted = (rate_unweighted * (1 - rate_unweighted)) / population,
+    ) %>%
+    select(-c(events_total, population_total))
 }
 data_sex <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, sex, date)
 data_ageband5year <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, ageband5year, date)
 data_region <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, region, date)
 data_all <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, all, date)
-
 
 # write to file ----
 
@@ -219,4 +179,3 @@ writetype_csv(data_sex, path = fs::path(analysis_dir, "rates_sex.csv"))
 writetype_csv(data_ageband5year, path = fs::path(analysis_dir, "rates_ageband5year.csv"))
 writetype_csv(data_region, path = fs::path(analysis_dir, "rates_region.csv"))
 writetype_csv(data_all, path = fs::path(analysis_dir, "rates_all.csv"))
-

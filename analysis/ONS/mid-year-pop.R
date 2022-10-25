@@ -71,5 +71,15 @@ ons_pop_estimates_region <-
     region
   )
 
+# in the above, age_int is eg 0, 1, 2, 4 and ageband5year is 0-4
+# we want to know the total number in ons pop in the ageband5year,
+# so we sum over the different age_int in the category ageband5year
+ons_pop_estimates_region <- 
+  ons_pop_estimates_region %>%
+  group_by(year, ageband5year, sex, region) %>%
+  summarise(mid_year_pop_ageband = sum(mid_year_pop),
+            .groups = "keep") %>%
+  ungroup() # forget grouping
+
 # save restructured estimates ----
 write_rds(ons_pop_estimates_region, here("ONS-data", "mid-year-pop.rds"))
