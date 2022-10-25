@@ -17,15 +17,13 @@ source(here("analysis", "lib", "design.R"))
 source(here("analysis", "lib", "functions.R"))
 
 ## define input/output directories ----
-
-fs::dir_create(here("output", "analysis"))
+output_dir <- here("output", "figures", "rates")
+fs::dir_create(output_dir)
 analysis_dir <- here("output", "analysis")
 #analysis_dir <- here("released_output", "analysis")
 
 
 # Import aggregated measures ----
-
-
 data_sex <- readtype_csv(file = fs::path(analysis_dir, "rates_sex.csv"))
 data_ageband5year <- readtype_csv(file = fs::path(analysis_dir, "rates_ageband5year.csv"))
 data_region <- readtype_csv(file = fs::path(analysis_dir, "rates_region.csv"))
@@ -59,10 +57,10 @@ data_long_all <- long(data_all)
 
 # plot TPP estimates of infection, etc ----
 
-plot_measures <- function(data_long, group, period){
+plot_measures <- function(data_long, group, period, output_dir, name){
 
   period0 <- period
-
+  
   data_long %>%
     filter(period==period0) %>%
     mutate(
@@ -99,13 +97,36 @@ plot_measures <- function(data_long, group, period){
       axis.text.x = element_text(hjust=0),
       strip.text.y = element_text(angle=0)
     )
-
+  
+  # save plot
+  filename <- paste0("rates_", name, "_", period, ".pdf")
+  filename <- fs::path(output_dir, filename)
+  ggsave(filename,
+         plot = last_plot(),
+         device = "pdf",
+         width = 20,
+         height = 12.5,
+         units = "cm")
 }
 
 
-plot_measures(data_long_sex, sex, "01")
-plot_measures(data_long_sex, sex, "14")
-plot_measures(data_long_sex, sex, "ever")
+plot_measures(data_long_sex, sex, "01", output_dir, "sex")
+plot_measures(data_long_sex, sex, "14", output_dir, "sex")
+plot_measures(data_long_sex, sex, "ever", output_dir, "sex")
+
+plot_measures(data_long_ageband5year, ageband5year, "01", output_dir, "ageband5year")
+plot_measures(data_long_ageband5year, ageband5year, "14", output_dir, "ageband5year")
+plot_measures(data_long_ageband5year, ageband5year, "ever", output_dir, "ageband5year")
+
+plot_measures(data_long_region, region, "01", output_dir, "region")
+plot_measures(data_long_region, region, "14", output_dir, "region")
+plot_measures(data_long_region, region, "ever", output_dir, "region")
+
+plot_measures(data_long_all, all, "01", output_dir, "all")
+plot_measures(data_long_all, all, "14", output_dir, "all")
+plot_measures(data_long_all, all, "ever", output_dir, "all")
+
+
 
 
 
