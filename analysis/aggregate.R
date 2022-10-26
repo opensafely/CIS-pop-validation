@@ -100,6 +100,16 @@ data_measures <-
 # import ONS mid population estimates ----
 ons_pop <- read_rds(here("ONS-data", "mid-year-pop.rds"))
 
+# in the above, age_int is eg 0, 1, 2, 4 and ageband5year is 0-4
+# we want to know the total number in ons pop in the ageband5year,
+# so we sum over the different age_int in the category ageband5year
+ons_pop <- 
+  ons_pop %>%
+  group_by(year, ageband5year, sex, region) %>%
+  summarise(ons_pop = sum(mid_year_pop),
+            .groups = "keep") %>%
+  ungroup() # forget grouping
+
 # 'ons_pop' has 342 columns: 19 ageband x 2 sex x 9 region
 # we multiply this table by 4, (342 x 4) to account for every year (2020-2023)
 # [note that we're using the same tables for every year for now]
@@ -107,7 +117,7 @@ ons_pop <- read_rds(here("ONS-data", "mid-year-pop.rds"))
 ons_pop <-
   ons_pop %>%
   mutate(
-    total_ons_pop = sum(mid_year_pop_ageband),
+    total_ons_pop = sum(ons_pop),
   ) %>%
   ungroup() %>%
   {
@@ -124,7 +134,7 @@ ons_pop <-
 data_measures_weights <-
   left_join(
     data_measures,
-    ons_pop %>% select(ageband5year, sex, region, year, mid_year_pop_ageband, total_ons_pop),
+    ons_pop %>% select(ageband5year, sex, region, year, ons_pop, total_ons_pop),
     by = c("ageband5year", "sex", "region", "year")
   ) %>%
   mutate(
@@ -152,8 +162,8 @@ rounded_rates <- function(data, ...){
     summarise(
       events_total = sum(events),
       population_total = sum(population),
-      rate_weighted = sum((mid_year_pop_ageband / total_ons_pop) * rate), 
-      var_rate_weighted = sum((1 / total_ons_pop^2) * (total_ons_pop^2 / population) * rate * (1 - rate)),
+      rate_weighted = sum((ons_pop / total_ons_pop) * rate), 
+      var_rate_weighted = sum((1 / total_ons_pop^2) * (ons_pop^2 / population) * rate * (1 - rate)),
       .groups = "keep",
     ) %>%
     ungroup() %>%
@@ -161,7 +171,7 @@ rounded_rates <- function(data, ...){
     mutate(
       events = roundmid_any(events_total,6),
       population = roundmid_any(population_total,6),
-      rate_unweighted = events/population,
+      rate_unweighted = events / population,
       var_rate_unweighted = (rate_unweighted * (1 - rate_unweighted)) / population,
     ) %>%
     select(-c(events_total, population_total))
