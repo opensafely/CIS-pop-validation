@@ -169,9 +169,9 @@ rounded_rates <- function(data, ...){
     ungroup() %>%
     # rounding
     mutate(
-      events = roundmid_any(events_total,6),
-      population = roundmid_any(population_total,6),
-      rate_unweighted = events / population,
+      events_roundmid6 = roundmid_any(events_total,6),
+      population_roundmid6 = roundmid_any(population_total,6),
+      rate_unweighted = events_roundmid6 / population_roundmid6,
       var_rate_unweighted = (rate_unweighted * (1 - rate_unweighted)) / population,
     ) %>%
     select(-c(events_total, population_total))
