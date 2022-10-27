@@ -49,7 +49,27 @@ data_measures <-
     }
   ) %>%
   mutate(
-    sex = factor(sex, levels=c("F", "M"), labels= c("Female", "Male")),
+    ageband5year = factor(ageband5year,
+                          levels = c("0-4",
+                                     "5-9",
+                                     "10-14",
+                                     "15-19",
+                                     "20-24",
+                                     "25-29",
+                                     "30-34",
+                                     "35-39",
+                                     "40-44",
+                                     "45-49",
+                                     "50-54",
+                                     "55-59",
+                                     "60-64",
+                                     "65-69",
+                                     "70-74",
+                                     "75-79",
+                                     "80-84",
+                                     "85-89",
+                                     "90+")),
+    sex = factor(sex, levels = c("F", "M"), labels = c("Female", "Male")),
     events = as.integer(events),
     population = as.integer(population),
     date = as.Date(date),
@@ -172,7 +192,7 @@ rounded_rates <- function(data, ...){
       events_roundmid6 = roundmid_any(events_total,6),
       population_roundmid6 = roundmid_any(population_total,6),
       rate_unweighted = events_roundmid6 / population_roundmid6,
-      var_rate_unweighted = (rate_unweighted * (1 - rate_unweighted)) / population,
+      var_rate_unweighted = (rate_unweighted * (1 - rate_unweighted)) / population_roundmid6,
     ) %>%
     select(-c(events_total, population_total))
 }
