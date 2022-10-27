@@ -136,10 +136,6 @@ ons_pop <-
 # the column total_ons_pop is needed to standardise the rates using the ons pop
 ons_pop <-
   ons_pop %>%
-  mutate(
-    total_ons_pop = sum(ons_pop),
-  ) %>%
-  ungroup() %>%
   {
     ## use 2020 mid-year estimates until updated mid-year estimates come along...
     bind_rows(
@@ -154,7 +150,7 @@ ons_pop <-
 data_measures_weights <-
   left_join(
     data_measures,
-    ons_pop %>% select(ageband5year, sex, region, year, ons_pop, total_ons_pop),
+    ons_pop %>% select(ageband5year, sex, region, year, ons_pop),
     by = c("ageband5year", "sex", "region", "year")
   ) %>%
   mutate(
@@ -182,6 +178,7 @@ rounded_rates <- function(data, ...){
     summarise(
       events_total = sum(events),
       population_total = sum(population),
+      total_ons_pop = sum(ons_pop),
       rate_weighted = sum((ons_pop / total_ons_pop) * rate), 
       var_rate_weighted = sum((1 / total_ons_pop^2) * (ons_pop^2 / population) * rate * (1 - rate)),
       .groups = "keep",
@@ -196,6 +193,7 @@ rounded_rates <- function(data, ...){
     ) %>%
     select(-c(events_total, population_total))
 }
+
 data_sex <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, sex, date)
 data_ageband5year <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, ageband5year, date)
 data_region <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, region, date)
