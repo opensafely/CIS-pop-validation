@@ -168,10 +168,10 @@ roundmid_any <- function(x, to=1){
 # ceiling. 
 # 0 is mapped to 0,
 # 1, 2, 3, 4, 5, 6 is mapped to 3
-# 7, 8, 9, 10, 11, 12 is mapped to 6
-# 13, 14, 15, 16, 17, 18 is mapped to 9 
+# 7, 8, 9, 10, 11, 12 is mapped to 9
+# 13, 14, 15, 16, 17, 18 is mapped to 15 
 # etc.
-# it maps to mid of upper bound of interval
+# it maps to left mid of interval
 rounded_rates <- function(data, ...){
   data %>%
     group_by(...) %>%
