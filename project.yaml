@@ -591,6 +591,69 @@ actions:
       highly_sensitive:
         cohort: output/measures/input_2022-09-25.feather
 
+  extract_data_20221009:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2022-10-09 to 2022-10-09 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2022-10-09.feather
+
+  extract_data_20221023:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2022-10-23 to 2022-10-23 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2022-10-23.feather
+
+  extract_data_20221106:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2022-11-06 to 2022-11-06 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2022-11-06.feather
+
+  extract_data_20221120:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2022-11-20 to 2022-11-20 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2022-11-20.feather
+
+  extract_data_20221204:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2022-12-04 to 2022-12-04 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2022-12-04.feather
+
+  extract_data_20221218:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2022-12-18 to 2022-12-18 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2022-12-18.feather
+
+  extract_data_20230101:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2023-01-01 to 2023-01-01 by week' --output-dir 'output/measures'
+      --output-format feather
+    needs: []
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_2023-01-01.feather
+
   measures:
     run: cohortextractor:latest generate_measures --study-definition study_definition
       --output-dir=output/measures
@@ -659,6 +722,13 @@ actions:
     - extract_data_20220828
     - extract_data_20220911
     - extract_data_20220925
+    - extract_data_20221009
+    - extract_data_20221023
+    - extract_data_20221106
+    - extract_data_20221120
+    - extract_data_20221204
+    - extract_data_20221218
+    - extract_data_20230101
     outputs:
       moderately_sensitive:
         cohort: output/measures/measure_*.csv
