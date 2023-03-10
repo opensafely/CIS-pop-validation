@@ -7,11 +7,11 @@ covid_icd10 = codelist_from_csv(
     column="icd10_code",
 )
 
-covid_emergency = codelist(
-    ["1240751000000100"],
+covid_emergency = codelist_from_csv(
+    "codelists/opensafely-covid-19-ae-diagnosis-codes.csv",
     system="snomed",
+    column="code",
 )
-
 
 covid_primary_care_positive_test = codelist_from_csv(
     "codelists/opensafely-covid-identification-in-primary-care-probable-covid-positive-test.csv",

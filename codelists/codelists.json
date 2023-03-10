@@ -95,6 +95,12 @@
       "url": "https://codelists.opensafely.org/codelist/primis-covid19-vacc-uptake/domcare/v1/",
       "downloaded_at": "2022-07-01 14:37:04.824788Z",
       "sha": "711f760dbd4869a8836a7bf6bfc062c1fc286095"
+    },
+    "opensafely-covid-19-ae-diagnosis-codes.csv": {
+      "id": "opensafely/covid-19-ae-diagnosis-codes/1df1c0b2",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/covid-19-ae-diagnosis-codes/1df1c0b2/",
+      "downloaded_at": "2023-03-10 10:41:34.223434Z",
+      "sha": "e948d6944aa5e2c5f36d92ba009077bc28fdcc31"
     }
   }
 }
