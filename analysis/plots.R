@@ -35,16 +35,28 @@ data_all <- readtype_csv(file = fs::path(analysis_dir, "rates_all.csv"))
 long <- function(data){
   data %>%
     pivot_longer(
-      cols=c("rate_unweighted","rate_weighted"),
-      names_to="weighted",
-      values_to="rate"
+      cols = c("rate_unweighted","rate_weighted"),
+      names_to = "weighted",
+      values_to = "rate"
+    ) %>%
+    mutate(
+      var = case_when(weighted == "rate_unweighted" ~ var_rate_unweighted,
+                      weighted == "rate_weighted" ~ var_rate_weighted)
+    ) %>%
+    select(
+      -c(var_rate_unweighted, var_rate_weighted)
     ) %>%
     mutate(
       weighted = case_when(
-        weighted=="rate_unweighted" ~ "Unweighted",
-        weighted=="rate_weighted" ~ "Weighted",
-        TRUE ~ NA_character_
-      )
+        weighted == "rate_unweighted" ~ "Unweighted",
+        weighted == "rate_weighted" ~ "Weighted",
+        TRUE ~ NA_character_),
+      rate = case_when(
+        period == "14" ~ rate / 14,
+        TRUE ~ rate),
+      var = case_when(
+        period == "14" ~ var / (14 ^ 2),
+        TRUE ~ var),
     )
 }
 
@@ -79,14 +91,14 @@ plot_measures <- function(data_long, group, period, output_dir, name){
         breaks = as.Date(seq(floor_date(study_dates$start_date, "year"), ceiling_date(study_dates$end_date, "year"), by="year")),
         labels = scales::label_date("%Y")
       )
-    )+
+    ) +
     scale_y_continuous(
       #limits=c(0,1),
-      labels=scales::label_number(scale=1000)
+      labels=scales::label_number(scale=100)
     )+
     labs(
       x="Date",
-      y="Rate per 1,000 people",
+      y="Incidence Rate (%)",
       colour=NULL,
       linetype=NULL
     )+
