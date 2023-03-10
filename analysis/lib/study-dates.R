@@ -14,7 +14,7 @@ fs::dir_create(here::here("analysis", "lib"))
 study_dates <- tibble::lst(
   start_date = "2020-04-26", # Sunday 26 April 2020, one day before the first 
                              # date of ONS-CIS
-  end_date = "2022-10-02", # Sunday 2 October 2022, should be updated when rerun
+  end_date = "2023-01-01", # Sunday 1 January 2023, should be updated when rerun
 )
 
 ## NOTE: we use one day before the start of ONS-CIS so that
