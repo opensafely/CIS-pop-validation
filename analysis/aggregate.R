@@ -191,7 +191,7 @@ rounded_rates <- function(data, ...){
       rate_unweighted = events_roundmid6 / population_roundmid6,
       var_rate_unweighted = (rate_unweighted * (1 - rate_unweighted)) / population_roundmid6,
     ) %>%
-    select(-c(events_total, population_total))
+    select(-c(events_total, population_total, events_roundmid6, population_roundmid6))
 }
 
 data_sex <- rounded_rates(data_measures_weights, measure, measure_descr, period, period_descr, sex, date)
