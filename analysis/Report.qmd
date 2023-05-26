@@ -1,0 +1,223 @@
+---
+title: "Coverage of SARS-CoV-2 infections in routinely collected health records"
+author: "OpenSAFELY Collaborative"
+date: today
+affiliation: Bennett Institute for Applied Data Science
+format: html
+editor: visual
+---
+
+## Introduction
+
+The ONS COVID-19 Infection Survey (ONS-CIS) was designed to estimate the incidence of COVID-19 and prevalence of immunity, by longitudinal sampling of randomly selected private households across the UK, covering around 100,000 people. It provides robust nationally representative estimates of infection incidence, positivity and anti-body prevalence, and variant type.
+
+Observational epidemiologic COVID-19 research, e.g. studies into the effectiveness of COVID-19 vaccines or therapeutics, often rely on routinely collected data on infection. These studies for example utilise data obtained from the Second Generation Surveillance System (SGSS) which is used to report community and hospital PCR and LFT testing data. Primary care and hospital data can also directly provide information on potential infection episodes. However, these routinely collected data sources are vulnerable to ascertainment biases related to health-seeking behaviours, healthcare and testing access, asymptomatic disease, and other data quality issues.
+
+This report sets out to quantify the coverage of SARS-CoV-2 infection in observational data by comparing the estimated incidence of infection from the ONS-CIS with crude estimates obtained from routinely collected health records in OpenSAFELY.
+
+## Results
+### National estimates
+::: panel-tabset
+## Infection Incidence
+
+```{r}
+#| echo: false
+#| warning: false
+data_national <-
+  read_rds(here::here("output", "analysis", "combined", "estimates_national.rds"))
+source(here::here("analysis", "lib", "design.R"))
+p <-
+  data_national %>% filter(name == "infections") %>%
+  ggplot(aes(x = date, y = rate, fill = source)) + 
+  geom_line(aes(colour = source)) +
+  geom_ribbon(aes(ymin = rate_lower, ymax = rate_upper, fill = source), 
+              alpha = 0.35, colour = NA) +
+  facet_grid(rows = vars(measure_descr)) + 
+  scale_x_date(
+      labels = scales::label_date("%b"),
+      expand = expansion(add=1),
+      sec.axis = sec_axis(
+        trans = ~as.Date(.),
+        breaks = as.Date(seq(floor_date(study_dates$start_date, "year"), 
+                             ceiling_date(study_dates$end_date, "year"), by="year")),
+        labels = scales::label_date("%Y")
+      )
+    ) +
+  scale_y_continuous(
+      labels=scales::percent_format(0.1)
+    ) +
+  labs(
+      x="Date",
+      y="Incidence Rate"
+    ) +
+    theme_minimal()+
+    theme(
+      legend.position="bottom",
+      axis.ticks.x = element_line(),
+      axis.text.x = element_text(hjust=0),
+      strip.text.y = element_text(angle=0)
+    )
+p
+```
+
+## Proportion ever infected
+
+```{r}
+#| echo: false
+#| warning: false
+data_national <-
+  read_rds(here::here("output", "analysis", "combined", "estimates_national.rds"))
+source(here::here("analysis", "lib", "design.R"))
+p <-
+  data_national %>% filter(name == "cumulative_exposure") %>%
+  ggplot(aes(x = date, y = rate, fill = source)) + 
+  geom_line(aes(colour = source)) +
+  geom_ribbon(aes(ymin = rate_lower, ymax = rate_upper, fill = source), 
+              alpha = 0.35, colour = NA) +
+  facet_grid(rows = vars(measure_descr), scales = "fixed") + 
+  scale_x_date(
+      labels = scales::label_date("%b"),
+      expand = expansion(add=1),
+      sec.axis = sec_axis(
+        trans = ~as.Date(.),
+        breaks = as.Date(seq(floor_date(study_dates$start_date, "year"), 
+                             ceiling_date(study_dates$end_date, "year"), by="year")),
+        labels = scales::label_date("%Y")
+      )
+    ) +
+  scale_y_continuous(
+      labels=scales::percent_format(0.1)
+    ) +
+  labs(
+      x="Date",
+      y="Proportion ever infected"
+    ) +
+    theme_minimal()+
+    theme(
+      legend.position="bottom",
+      axis.ticks.x = element_line(),
+      axis.text.x = element_text(hjust=0),
+      strip.text.y = element_text(angle=0)
+    )
+p
+```
+:::
+
+### Regional estimates
+::: panel-tabset
+## Infection Incidence
+
+```{r}
+#| echo: false
+#| warning: false
+source(here::here("analysis", "plots.R"))
+p <-
+  data_all %>% filter(name == "infections") %>%
+  ggplot(aes(x = date, y = rate, fill = source)) + 
+  geom_line(aes(colour = source)) +
+  geom_ribbon(aes(ymin = rate_lower, ymax = rate_upper, fill = source), 
+              alpha = 0.35, colour = NA) +
+  facet_grid(rows = vars(measure_descr)) + 
+  scale_x_date(
+      labels = scales::label_date("%b"),
+      expand = expansion(add=1),
+      sec.axis = sec_axis(
+        trans = ~as.Date(.),
+        breaks = as.Date(seq(floor_date(study_dates$start_date, "year"), 
+                             ceiling_date(study_dates$end_date, "year"), by="year")),
+        labels = scales::label_date("%Y")
+      )
+    ) +
+  scale_y_continuous(
+      labels=scales::percent_format(0.1)
+    ) +
+  labs(
+      x="Date",
+      y="Incidence Rate"
+    ) +
+    theme_minimal()+
+    theme(
+      legend.position="bottom",
+      axis.ticks.x = element_line(),
+      axis.text.x = element_text(hjust=0),
+      strip.text.y = element_text(angle=0)
+    )
+p
+```
+
+## Proportion ever infected
+
+```{r}
+#| echo: false
+#| warning: false
+source(here::here("analysis", "plots.R"))
+p1 <-
+  data_all %>% filter(name == "cumulative_exposure") %>%
+  ggplot(aes(x = date, y = rate, fill = source)) + 
+  geom_line(aes(colour = source)) +
+  geom_ribbon(aes(ymin = rate_lower, ymax = rate_upper, fill = source), 
+              alpha = 0.35, colour = NA) +
+  facet_grid(rows = vars(measure_descr), scales = "fixed") + 
+  scale_x_date(
+      labels = scales::label_date("%b"),
+      expand = expansion(add=1),
+      sec.axis = sec_axis(
+        trans = ~as.Date(.),
+        breaks = as.Date(seq(floor_date(study_dates$start_date, "year"), 
+                             ceiling_date(study_dates$end_date, "year"), by="year")),
+        labels = scales::label_date("%Y")
+      )
+    ) +
+  scale_y_continuous(
+      labels=scales::percent_format(0.1)
+    ) +
+  labs(
+      x="Date",
+      y="Proportion ever infected"
+    ) +
+    theme_minimal()+
+    theme(
+      legend.position="bottom",
+      axis.ticks.x = element_line(),
+      axis.text.x = element_text(hjust=0),
+      strip.text.y = element_text(angle=0)
+    )
+p1
+```
+:::
+
+## Methods
+
+
+### Data source
+
+#### OpenSAFELY-TPP
+
+This study used the [OpenSAFELY platform](https://www.opensafely.org/), providing secure access to the OpenSAFELY-TPP database containing primary care records managed by the GP software provider TPP, roughly 40% of English primary care practices in England. These recorded were linked, using NHS numbers, to A&E attendance and in-patient hospital spell records via NHS Digital's Hospital Episode Statistics (HES), national coronavirus testing records via the Second Generation Surveillance System (SGSS), and national death registry records from the Office for National Statistics (ONS).
+
+#### ONS-CIS
+
+This study used real-time epidemiological estimates from ONS-CIS data provided by the [epiforecast report](https://epiforecasts.io/inc2prev/report). These estimates were derived using regular updates of ONS-CIS summary data published on the ONS website. The survey only samples people living in a private residence, so excludes care home residents. Full methods of how the epiforecast estimates were derived can be found [elsewhere](https://epiforecasts.io/inc2prev/paper). The derived estimates from the epiforecast were used to make direct crude comparisons and were not imported into the OpenSAFELY-TPP secure environment.
+
+### Study population
+
+We consider all people aged between 12 and 120 years in the OpenSAFELY-TPP database (i.e., registered at a General Practice using TPP SystemOne software). People were excluded if they do not live in a private residence (to reflect survey sampling) and of whom geographic region or sex was unknown.
+
+### Measures
+
+We defined the following set of measures:
+
+-   **SARS-CoV-2 positive** The number of people who have a positive SARS-CoV-2 test recorded in SGSS, based on swab date. Both polymerase chain reaction (PCR) and lateral flow test results are included, without differentiation between symptomatic and asymptomatic infection.
+
+-   **Infection or disease identified in primary care** The number of people who have evidence of a SARS-CoV-2 infection or COVID-19 disease in their primary care health records.
+
+-   **Any infection** The number of people who have evidence of SARS-CoV-2 infection or COVID-19 disease from any source (SGSS, primary care health records, COVID-19-related A&E attendance or hospital admission).
+
+Each of these measures were calculated every two weeks, between Sunday 26 April 2020 and Sunday 1 January 2023. We consider the following periods for each measure:
+
+-   **Two-week average estimates** (proportion of people experiencing the event in a two-week period, averaged per day)
+-   **Ever-event estimates** (proportion of people who have ever experienced the event)
+
+The measures were standardised against the ONS population.
+
+As demonstrated, we took a simple approach in estimating infection incidence and ever-event infection using routinely collected data and did not use sophisticated modelling methods. COVID-19 re-infection episodes were not considered. Under ascertainment of SARS-CoV-2 infection is a potential source of bias in observational epidemiologic studies utilising these data sources for answering clinical questions. Other studies already have decisively demonstrated SGSS data can not be used to model estimates of incidence or ever-event infection \[refs\].
