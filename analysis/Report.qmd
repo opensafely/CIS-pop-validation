@@ -3,8 +3,9 @@ title: "Coverage of SARS-CoV-2 infections in routinely collected health records"
 author: "OpenSAFELY Collaborative"
 date: today
 affiliation: Bennett Institute for Applied Data Science
-format: html
-editor: visual
+format:
+  html:
+    embed-resources: true
 ---
 
 ## Introduction
@@ -23,6 +24,10 @@ This report sets out to quantify the coverage of SARS-CoV-2 infection in observa
 ```{r}
 #| echo: false
 #| warning: false
+library(ggplot2)
+library(tidyverse)
+library(readr)
+library(lubridate)
 data_national <-
   read_rds(here::here("output", "analysis", "combined", "estimates_national.rds"))
 source(here::here("analysis", "lib", "design.R"))
@@ -65,6 +70,10 @@ p
 ```{r}
 #| echo: false
 #| warning: false
+library(ggplot2)
+library(tidyverse)
+library(readr)
+library(lubridate)
 data_national <-
   read_rds(here::here("output", "analysis", "combined", "estimates_national.rds"))
 source(here::here("analysis", "lib", "design.R"))
@@ -110,39 +119,6 @@ p
 ```{r}
 #| echo: false
 #| warning: false
-source(here::here("analysis", "plots.R"))
-p <-
-  data_all %>% filter(name == "infections") %>%
-  ggplot(aes(x = date, y = rate, fill = source)) + 
-  geom_line(aes(colour = source)) +
-  geom_ribbon(aes(ymin = rate_lower, ymax = rate_upper, fill = source), 
-              alpha = 0.35, colour = NA) +
-  facet_grid(rows = vars(measure_descr)) + 
-  scale_x_date(
-      labels = scales::label_date("%b"),
-      expand = expansion(add=1),
-      sec.axis = sec_axis(
-        trans = ~as.Date(.),
-        breaks = as.Date(seq(floor_date(study_dates$start_date, "year"), 
-                             ceiling_date(study_dates$end_date, "year"), by="year")),
-        labels = scales::label_date("%Y")
-      )
-    ) +
-  scale_y_continuous(
-      labels=scales::percent_format(0.1)
-    ) +
-  labs(
-      x="Date",
-      y="Incidence Rate"
-    ) +
-    theme_minimal()+
-    theme(
-      legend.position="bottom",
-      axis.ticks.x = element_line(),
-      axis.text.x = element_text(hjust=0),
-      strip.text.y = element_text(angle=0)
-    )
-p
 ```
 
 ## Proportion ever infected
@@ -150,39 +126,23 @@ p
 ```{r}
 #| echo: false
 #| warning: false
-source(here::here("analysis", "plots.R"))
-p1 <-
-  data_all %>% filter(name == "cumulative_exposure") %>%
-  ggplot(aes(x = date, y = rate, fill = source)) + 
-  geom_line(aes(colour = source)) +
-  geom_ribbon(aes(ymin = rate_lower, ymax = rate_upper, fill = source), 
-              alpha = 0.35, colour = NA) +
-  facet_grid(rows = vars(measure_descr), scales = "fixed") + 
-  scale_x_date(
-      labels = scales::label_date("%b"),
-      expand = expansion(add=1),
-      sec.axis = sec_axis(
-        trans = ~as.Date(.),
-        breaks = as.Date(seq(floor_date(study_dates$start_date, "year"), 
-                             ceiling_date(study_dates$end_date, "year"), by="year")),
-        labels = scales::label_date("%Y")
-      )
-    ) +
-  scale_y_continuous(
-      labels=scales::percent_format(0.1)
-    ) +
-  labs(
-      x="Date",
-      y="Proportion ever infected"
-    ) +
-    theme_minimal()+
-    theme(
-      legend.position="bottom",
-      axis.ticks.x = element_line(),
-      axis.text.x = element_text(hjust=0),
-      strip.text.y = element_text(angle=0)
-    )
-p1
+```
+:::
+
+### Age estimates
+::: panel-tabset
+## Infection Incidence
+
+```{r}
+#| echo: false
+#| warning: false
+```
+
+## Proportion ever infected
+
+```{r}
+#| echo: false
+#| warning: false
 ```
 :::
 
