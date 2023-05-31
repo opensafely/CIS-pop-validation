@@ -96,15 +96,15 @@ study = StudyDefinition(
   ),
   
   age_kids=patients.age_as_of(
-    "first_day_of_school_year(index_date)",
+    "last_day_of_school_year(index_date)",
   ),
 
   agebandCIS=patients.categorised_as(
     {
       "": "DEFAULT",
-      "2-11" : "age_kids>=2 AND age_kids<=11", # ONS bases this on school year (aged 2 to to year 6)
-      "12-15" : "age_kids>=12 AND age_kids<=15", # ONS bases this on school year (year 7 to year 11)
-      "16-24" : "age_kids>=16 AND age_kids<=24", # ONS bases this on school year (year 12 to aged 24)
+      "2-Y6" : "age>=2 AND age_kids<=11", # ONS bases this on school year (aged 2 to to year 6)
+      "Y7-Y11" : "age_kids>=12 AND age_kids<=16", # ONS bases this on school year (year 7 to year 11)
+      "Y12-24" : "age_kids>=17 AND age<=24", # ONS bases this on school year (year 12 to aged 24)
       "25-34" : "age>=25 AND age<=34",
       "35-49" : "age>=35 AND age<=49",
       "50-69" : "age>=50 AND age<=69",
@@ -113,9 +113,9 @@ study = StudyDefinition(
     return_expectations={
       "category":{"ratios": 
         {
-        "2-11"  : 0.1,
-        "12-15" : 0.1, 
-        "16-24" : 0.1, 
+        "2-Y6"  : 0.1,
+        "Y7-Y11" : 0.1, 
+        "Y12-24" : 0.1, 
         "25-34" : 0.1,
         "35-49" : 0.2,
         "50-69" : 0.2,
@@ -266,6 +266,33 @@ study = StudyDefinition(
           #"" : 0.01
         },
       },
+    },
+  ),
+  
+  region_epiforecast=patients.categorised_as(
+    {
+      "": "DEFAULT",
+      "East"   : "region = 'East'", 
+      "London" : "region = 'London'",
+      "Midlands": "region = 'East Midlands' OR region = 'West Midlands'",
+      "North East and Yorkshire": "region = 'North East' OR region = 'Yorkshire and The Humber'", 
+      "North West" : "region = 'North West'", 
+      "South East" : "region = 'South East'",
+      "South West" : "region = 'South West'",
+    },
+    return_expectations={
+      "rate": "universal",
+      "category":{"ratios": 
+        {
+        "East"   : 0.1,
+        "London"   : 0.1,
+        "Midlands" : 0.2,
+        "North East and Yorkshire" : 0.3,
+        "North West" : 0.1,
+        "South East" : 0.1,
+        "South West" : 0.1
+        }
+      }
     },
   ),
   
@@ -523,42 +550,35 @@ measures = [
       id="postest_01",
       numerator="postest_01",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
-    # Measure(
-    #   id="postest_symptomatic_01",
-    #   numerator="postest_symptomatic_01",
-    #   denominator="population",
-    #   group_by=["sex", "ageband5year", "region"],
-    #   small_number_suppression=False
-    # ),
     Measure(
       id="primary_care_covid_case_01",
       numerator="primary_care_covid_case_01",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
     Measure(
       id="covidemergency_01",
       numerator="covidemergency_01",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
     Measure(
       id="covidadmitted_01",
       numerator="covidadmitted_01",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
     Measure(
       id="any_infection_or_disease_01",
       numerator="any_infection_or_disease_01",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
 
@@ -567,42 +587,35 @@ measures = [
       id="postest_14",
       numerator="postest_14",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
-    # Measure(
-    #   id="postest_symptomatic_14",
-    #   numerator="postest_symptomatic_14",
-    #   denominator="population",
-    #   group_by=["sex", "ageband5year", "region"],
-    #   small_number_suppression=False
-    # ),
     Measure(
       id="primary_care_covid_case_14",
       numerator="primary_care_covid_case_14",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
     Measure(
       id="covidemergency_14",
       numerator="covidemergency_14",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
     Measure(
       id="covidadmitted_14",
       numerator="covidadmitted_14",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
     Measure(
       id="any_infection_or_disease_14",
       numerator="any_infection_or_disease_14",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
 
@@ -611,44 +624,37 @@ measures = [
       id="postest_ever",
       numerator="postest_ever",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
-    # Measure(
-    #   id="postest_symptomatic_ever",
-    #   numerator="postest_symptomatic_ever",
-    #   denominator="population",
-    #   group_by=["sex", "ageband5year", "region"],
-    #   small_number_suppression=False
-    # ),
     Measure(
       id="primary_care_covid_case_ever",
       numerator="primary_care_covid_case_ever",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
     Measure(
       id="covidemergency_ever",
       numerator="covidemergency_ever",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
     Measure(
       id="covidadmitted_ever",
       numerator="covidadmitted_ever",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
     ),
     Measure(
       id="any_infection_or_disease_ever",
       numerator="any_infection_or_disease_ever",
       denominator="population",
-      group_by=["sex", "ageband5year", "region"],
+      group_by=["sex", "ageband5year", "region", "agebandCIS", "region_epiforecast"],
       small_number_suppression=False
-    )
+    ),
 
 ]
 

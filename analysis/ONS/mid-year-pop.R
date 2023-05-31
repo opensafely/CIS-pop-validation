@@ -14,7 +14,15 @@ library('here')
 fs::dir_create(here("ONS-data"))
 
 # download mid year pop estimates ----
-ons_pop_estimates <- ons_get("mid-year-pop-est")
+ons_pop_estimates_2020 <- 
+  ons_get("mid-year-pop-est", edition = "mid-2020-april-2021-geography") %>%
+  filter(`calendar-years`==2020)
+ons_pop_estimates_2021 <- 
+  ons_get("mid-year-pop-est", edition = "mid-2021-april-2022-geography") %>%
+  filter(`calendar-years`==2021)
+ons_pop_estimates <-
+  bind_rows(ons_pop_estimates_2020,
+            ons_pop_estimates_2021)
 
 # restructure to same format as our estimates are in ----
 ons_pop_estimates_region <-
@@ -32,8 +40,7 @@ ons_pop_estimates_region <-
       "E12000009" 
     ), # nine regions in England
     sex %in% c("male", "female"),
-    `single-year-of-age` %in% c(0:89, "90+"),
-    `calendar-years`==2020
+    `single-year-of-age` %in% c(0:89, "90+")
   ) %>%
   transmute(
     year=`calendar-years`,
@@ -60,6 +67,15 @@ ons_pop_estimates_region <-
       age_int>=85 & age_int<=89 ~ "85-89",
       age_int>=90 ~ "90+",
     ),
+    agebandCIS = case_when(
+      age_int>=2 & age_int<=10 ~ "2-Y6",
+      age_int>=11 & age_int<=15 ~ "Y7-Y11",
+      age_int>=16 & age_int<=24 ~ "Y12-24",
+      age_int>=25 & age_int<=34 ~ "25-34",
+      age_int>=35 & age_int<=49 ~ "35-49",
+      age_int>=50 & age_int<=69 ~ "50-69",
+      age_int>=70 ~ "70+",
+    ),
     ageband5year = factor(ageband5year,
                           levels = c("0-4",
                                      "5-9",
@@ -80,10 +96,23 @@ ons_pop_estimates_region <-
                                      "80-84",
                                      "85-89",
                                      "90+")),
+    agebandCIS = factor(agebandCIS,
+                        levels = c("2-Y6",
+                                   "Y7-Y11",
+                                   "Y12-24",
+                                   "25-34",
+                                   "35-49",
+                                   "50-69",
+                                   "70+")),
     sex=`Sex`,
     region=str_replace(str_to_title(`Geography`), "And The", "and The"), # TPP
-    mid_year_pop=`v4_0`,
-  ) %>%
+    mid_year_pop=`v4_0`) %>%
+  mutate(
+    region_epiforecast = case_when(
+      region == "East Midlands" | region == "West Midlands" ~ "Midlands",
+      region == "North East" | region == "Yorkshire and The Humber" ~ "North East and Yorkshire",
+      TRUE ~ region),
+    .before = mid_year_pop) %>%
   arrange(
     year,
     age_int,
