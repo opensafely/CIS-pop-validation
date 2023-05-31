@@ -1,0 +1,212 @@
+---
+title: "Ascertainment of SARS-CoV-2 infections in routinely collected health records"
+author: "OpenSAFELY Collaborative"
+date: today
+affiliation: Bennett Institute for Applied Data Science
+format:
+  html:
+    embed-resources: true
+---
+
+## Introduction
+
+
+Observational epidemiologic COVID-19 research typically rely on data from routinely-collected electronic health records to obtain relevant information on the study population, including timing and severity of individual SARS-CoV-2 infection episodes. For instance, SARS-CoV-2 infection is an important outcome when studying COVID-19 vaccine effectiveness, and is a critical component of treatment eligibility in studies of COVID-19 therapeutics. In the absence of compulsory daily SARS-CoV-2 testing for the entire population, however, there is no definitive source of SARS-CoV-2 infection. Instead, infection episodes must be derived imperfectly from available sources, such as national SARS-CoV-2 surveillance data, and primary care and hospital records. These sources are vulnerable to ascertainment biases related to health-seeking behaviours, differential access to healthcare and testing, asymptomatic disease and disease severity, and other data quality issues.
+
+The ONS COVID-19 Infection Survey (ONS-CIS) was designed to estimate the incidence of SARS-CoV-2 infection and prevalence of immunity, by longitudinal sampling of randomly selected private households across the UK, covering around 100,000 people. It provides robust national and regional estimates of SARS-CoV-2 infection incidence, positivity and anti-body prevalence, and variant type over time. Attempting to replicate ONS-CIS-derived estimates of SARS-CoV-2 infection using EHR data can provide important insights into the reliability of EHR data for infection ascertainment. 
+
+This report sets out to assess ascertainment of SARS-CoV-2 infection in routinely-collected data by comparing the estimated incidence of infection from the ONS-CIS with naive estimates obtained from data in the OpenSAFELY-TPP database.
+
+
+
+## Methods
+
+### Data source
+
+#### OpenSAFELY-TPP
+
+All data were linked, stored, and analysed securely within the [OpenSAFELY platform](https://www.opensafely.org/). We used the OpenSAFELY-TPP database, containing primary care records from General Practices using the clinical management software provided by TPP (roughly 40% of practices in England). The database also contains linked data on: A&E attendances from the Emergency Care Data Set (ECDS) and in-patient hospital records from Hospital Episode Statistics Admitted Patient Care (HES APC), both via NHS Digital's Secondary Use Service (SUS); community and hospital PCR and LFT SARS-CoV-2 tests from the Second Generation Surveillance System (SGSS) ; national death registry records from the Office for National Statistics (ONS).
+
+
+#### ONS-CIS
+
+This study used real-time epidemiological estimates from ONS-CIS data provided by the [epiforecast report](https://epiforecasts.io/inc2prev/report). These estimates were derived using regular updates of ONS-CIS summary data published on the ONS website. The survey only samples people living in a private residence, so excludes care home residents. Full methods of how the epiforecast estimates were derived are available in a [pre-print](https://doi.org/10.1101/2022.03.29.22273101). The derived estimates from the epiforecast were used to make direct crude comparisons and were not imported into the OpenSAFELY-TPP secure environment.
+
+
+
+### Study population
+
+EHR data was compared with ONS-CIS data every two weeks, between Sunday 26 April 2020 and Sunday 1 January 2023, as reported by epiforcasts. 
+
+For each date, we consider all people aged between 12 and 120 years registered in the OpenSAFELY-TPP database on that date. People were excluded if they do not live in a private residence (to reflect ONS-CIS survey sampling) and if geographic region or sex was unknown. All population characteristics were re-derived for each date. 
+
+### SARS-CoV-2 infection estimates
+
+SARS-CoV-2 infection events were defined using OpenSAFELY-TPP data in one of three ways:
+
+- **SARS-CoV-2 positive test** The number of people who have a positive SARS-CoV-2 test recorded in SGSS, based on swab date. Both polymerase chain reaction (PCR) and lateral flow test results are included, without differentiation between symptomatic and asymptomatic infection.
+
+- **Primary care derived infection or disease** The number of people who have evidence of a SARS-CoV-2 infection or COVID-19 disease in their primary care health records.
+
+- **Any documented infection or disease** The number of people who have evidence of SARS-CoV-2 infection or COVID-19 disease from any either SGSS, primary care records, COVID-19-related A&E attendance or in-patient spells.
+
+The ascertainment period for these events were considered in one of two ways:
+
+- **Two-week estimates** The proportion of people experiencing the event in the two-week period on or before the date.
+- **Ever estimates** The proportion of people who have ever experienced the event on or before the date.
+
+Infection estimates were standardised to match the English population using strata of 5-year age bands, sex, and region. Briefly, infection rates were estimated in age-sex-region strata, then the population-level (or subgroup-level, see below) estimates we recovered by averaging the stratum-specific estimates, weighted in proportion to the size of each stratum in the English population. Strata population sizes were obtained from the ONS mid-year population estimates (ref). 
+
+### Subgroups
+
+Infection rates were reported overall and by age, sex, and region. We replicated age categories used in ONS-CIS reporting (reference).
+
+
+
+
+
+## Results
+
+### National estimates
+::: panel-tabset
+
+## Two-week estimates
+
+```{r}
+#| echo: false
+#| warning: false
+library(ggplot2)
+library(tidyverse)
+library(readr)
+library(lubridate)
+data_national <-
+  read_rds(here::here("output", "analysis", "combined", "estimates_national.rds"))
+source(here::here("analysis", "lib", "design.R"))
+p <-
+  data_national %>% filter(name == "infections") %>%
+  ggplot(aes(x = date, y = rate, fill = source)) + 
+  geom_line(aes(colour = source)) +
+  geom_ribbon(aes(ymin = rate_lower, ymax = rate_upper, fill = source), 
+              alpha = 0.35, colour = NA) +
+  facet_grid(rows = vars(measure_descr)) + 
+  scale_x_date(
+      labels = scales::label_date("%Y"),
+      breaks = as.Date(seq(floor_date(study_dates$start_date, "year"), 
+                             ceiling_date(study_dates$end_date, "year"), by="1 year")),
+      minor_breaks = as.Date(seq(floor_date(study_dates$start_date, "month"), 
+                             ceiling_date(study_dates$end_date, "month"), by="1 month")),
+      expand = expansion(add=1),
+    ) +
+  scale_y_continuous(
+      labels=scales::percent_format(0.1)
+    ) +
+  labs(
+      x="Date",
+      y="Incidence rate per day",
+      colour=NULL,
+      fill=NULL
+    ) +
+    theme_minimal()+
+    theme(
+      legend.position="bottom",
+      axis.ticks.x = element_line(),
+      axis.text.x = element_text(hjust=0),
+      strip.text.y = element_text(angle=0),
+      
+      
+    )
+p
+```
+
+## Ever estimates
+
+```{r}
+#| echo: false
+#| warning: false
+library(ggplot2)
+library(tidyverse)
+library(readr)
+library(lubridate)
+data_national <-
+  read_rds(here::here("output", "analysis", "combined", "estimates_national.rds"))
+source(here::here("analysis", "lib", "design.R"))
+p <-
+  data_national %>% filter(name == "cumulative_exposure") %>%
+  ggplot(aes(x = date, y = rate, fill = source)) + 
+  geom_line(aes(colour = source)) +
+  geom_ribbon(aes(ymin = rate_lower, ymax = rate_upper, fill = source), 
+              alpha = 0.35, colour = NA) +
+  facet_grid(rows = vars(measure_descr), scales = "fixed") + 
+  scale_x_date(
+      labels = scales::label_date("%Y"),
+      breaks = as.Date(seq(floor_date(study_dates$start_date, "year"), 
+                             ceiling_date(study_dates$end_date, "year"), by="1 year")),
+      minor_breaks = as.Date(seq(floor_date(study_dates$start_date, "month"), 
+                             ceiling_date(study_dates$end_date, "month"), by="1 month")),
+      expand = expansion(add=1),
+    ) +
+  scale_y_continuous(
+      labels=scales::percent_format(0.1)
+    ) +
+  labs(
+      x="Date",
+      y="Proportion ever infected",
+      colour=NULL,
+      fill=NULL
+    ) +
+    theme_minimal()+
+    theme(
+      legend.position="bottom",
+      axis.ticks.x = element_line(),
+      axis.text.x = element_text(hjust=0),
+      strip.text.y = element_text(angle=0)
+    )
+p
+```
+:::
+
+### Regional estimates
+::: panel-tabset
+## Infection Incidence
+
+```{r}
+#| echo: false
+#| warning: false
+```
+
+## Proportion ever infected
+
+```{r}
+#| echo: false
+#| warning: false
+```
+:::
+
+### Age estimates
+::: panel-tabset
+## Infection Incidence
+
+```{r}
+#| echo: false
+#| warning: false
+```
+
+## Proportion ever infected
+
+```{r}
+#| echo: false
+#| warning: false
+```
+:::
+
+
+
+## Commentary
+
+
+
+This report highlights issue with a naive approach to ascertainment and interpretation of population-level infection rates obtained from routinely-collected data. The estimated proportion of those experiencing a SARS-CoV-2 infection episode over time is substantially underestimated in routinely-collected health data compared with the ONS-CIS gold standard. This underestimation appears worse in...
+
+Our simple approach to estimating infection incidence and ever-event infection using routinely-collected data and did not use sophisticated modelling methods. Under ascertainment of SARS-CoV-2 infection is a likely source of bias in observational epidemiologic studies using these data sources for answering clinical questions. Other studies already have decisively demonstrated SGSS data can not be used to model estimates of incidence or ever-event infection \[refs\].
+
+The ONS-CIS dataset has been linked to the OpenSAFELY-TPP database. This provides an opportunity to compare infection episode capture with that in ONS-CIS _within_ individuals, not just within populations as in this report. 

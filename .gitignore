@@ -11,3 +11,5 @@ venv/
 .Rproj.user/
 *.Rproj
 /epiforecast-data/
+/analysis/Report_files/
+/analysis/Report.html
