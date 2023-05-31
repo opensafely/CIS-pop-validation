@@ -30,11 +30,11 @@ measures_lookup <- tribble(
 recoder <-
   lst(
     measure = c(
-      "Positive SARS-CoV-2 test" = "postest",
-      "Infection or disease identified in primary care" = "primary_care_covid_case",
+      "SARS-CoV-2 positive test" = "postest",
+      "Primary care derived infection or disease" = "primary_care_covid_case",
       "COVID-19 A&E attendance" = "covidemergency",
       "COVID-19 hospitalisation" = "covidadmitted",
-      "Any infection or disease" = "any_infection_or_disease"
+      "Any documented infection or disease" = "any_infection_or_disease"
     ),
     period = c(
       "Single-day" = "01",
