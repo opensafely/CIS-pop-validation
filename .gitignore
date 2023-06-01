@@ -10,4 +10,4 @@ venv/
 .Rhistory
 .Rproj.user/
 *.Rproj
-/epiforecast-data/
+/epiforecast-data/*.csv
