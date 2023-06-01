@@ -10,6 +10,7 @@
 library('tidyverse')
 library('lubridate')
 library('here')
+library('readr')
 ## import design elements ----
 source(here("analysis", "lib", "design.R"))
 source(here("analysis", "lib", "functions.R"))
