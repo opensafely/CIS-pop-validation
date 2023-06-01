@@ -127,31 +127,15 @@ data_measures <-
     date,
   )
 
-# change dummy data to make code testable 
-if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")){
-  data_measures <- 
-    data_measures %>% 
-    group_by(ageband5year, sex, region, year, measure, period, date) %>%
-    summarise(events = sum(events),
-              population = sum(population),
-              rate = events / population,
-              .groups = "keep") %>%
-    mutate(
-      agebandCIS = case_when(
-        ageband5year == "0-4" | ageband5year == "5-9" ~ "2-Y6",
-        ageband5year == "10-14" ~ "Y7-Y11",
-        ageband5year == "15-19" | ageband5year == "20-24" ~ "Y12-24",
-        ageband5year == "25-29" | ageband5year == "30-34" ~ "25-34",
-        ageband5year %in% c("35-39", "40-44", "45-49")~ "35-49",
-        ageband5year %in% c("50-54", "55-59", "60-64", "65-69") ~ "50-69",
-        TRUE ~ "70+",
-      ),
-      region_epiforecast = case_when(
-        region == "East Midlands" | region == "West Midlands" ~ "Midlands",
-        region == "North East" | region == "Yorkshire and The Humber" ~ "North East and Yorkshire",
-        TRUE ~ region)
-    )
-}
+# number of categories in table: 
+# number of dates x number of measures (5) x number of periods (3) x sex (2) x 
+# combi ageband5year and agebandCIS (21) x combi region and region_epiforecast (9)
+# 2*5*3*2*21*9
+lookupcat <- read_rds(here("epiforecast-data", "lookupcat.rds"))
+data_measures <-
+  data_measures %>% 
+  inner_join(lookupcat,
+             by = c("ageband5year", "agebandCIS", "region", "region_epiforecast"))
 
 # import ONS mid population estimates ----
 ons_pop <- read_rds(here("ONS-data", "mid-year-pop.rds"))
@@ -216,8 +200,8 @@ rounded_rates <- function(data, ...){
       events_total = sum(events),
       population_total = sum(population),
       total_ons_pop = sum(ons_pop),
-      rate_weighted = sum((ons_pop / total_ons_pop) * rate), 
-      var_rate_weighted = sum((1 / total_ons_pop^2) * (ons_pop^2 / population) * rate * (1 - rate)),
+      rate_weighted = sum((ons_pop / total_ons_pop) * rate, na.rm = TRUE), 
+      var_rate_weighted = sum((1 / total_ons_pop^2) * (ons_pop^2 / population) * rate * (1 - rate), na.rm = TRUE),
       .groups = "keep",
     ) %>%
     ungroup() %>%
