@@ -229,7 +229,7 @@ data_all <- rounded_rates(data_measures_weights, measure, measure_descr, period,
 
 writetype_csv(data_sex, path = fs::path(analysis_dir, "rates_sex.csv"))
 writetype_csv(data_ageband5year, path = fs::path(analysis_dir, "rates_ageband5year.csv"))
-writetype_csv(data_ageband5year, path = fs::path(analysis_dir, "rates_agebandCIS.csv"))
+writetype_csv(data_agebandCIS, path = fs::path(analysis_dir, "rates_agebandCIS.csv"))
 writetype_csv(data_region, path = fs::path(analysis_dir, "rates_region.csv"))
-writetype_csv(data_region, path = fs::path(analysis_dir, "rates_region_epiforecast.csv"))
+writetype_csv(data_region_epiforecast, path = fs::path(analysis_dir, "rates_region_epiforecast.csv"))
 writetype_csv(data_all, path = fs::path(analysis_dir, "rates_all.csv"))
